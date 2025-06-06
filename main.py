@@ -4,9 +4,8 @@ from openai import OpenAI
 from config import settings
 from functools import lru_cache
 
-class Item(BaseModel):
-    name:str
-    decription:str
+class Prompt(BaseModel):
+    input:str
 
 app = FastAPI()
 
@@ -19,12 +18,12 @@ async def root():
     return {"message": "Hello, World!"}
 
 @app.post("/items/")
-async def create_item(item:Item):
+async def create_item(prompt:Prompt):
     client = OpenAI(api_key=settings.openai_api_key)
 
     response = client.responses.create(
         model="gpt-4.1",
-        input="O Heitor Alcooltra é um grande amigo meu ?",
+        input=prompt.input
     )
 
-    return item
+    return response.output_text
