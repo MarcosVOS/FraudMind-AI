@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-
+from openai import OpenAI
+from config import settings
+from functools import lru_cache
 
 class Item(BaseModel):
     name:str
@@ -8,11 +10,21 @@ class Item(BaseModel):
 
 app = FastAPI()
 
+@lru_cache
+def get_settings():
+    return config.Settings()
+
 @app.get("/")
 async def root():
     return {"message": "Hello, World!"}
 
 @app.post("/items/")
 async def create_item(item:Item):
+    client = OpenAI(api_key=settings.openai_api_key)
+
+    response = client.responses.create(
+        model="gpt-4.1",
+        input="O Heitor Alcooltra é um grande amigo meu ?",
+    )
 
     return item
